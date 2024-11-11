@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const db = require('./config/db'); // Adjust path as necessary
 const app = express();
 const PORT = process.env.PORT || 3000;
