@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management System</title>
+    <style>
+        *
+
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #f4711e;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .date-input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 120px; /* Set to your desired width */
+}
+
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-go {
+            background: #4285f4;
+            color: white;
+        }
+
+        .btn-add {
+            background: #2ecc71;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #f4711e;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status-overdue {
+            background: #ffebee;
+            color: #c62828;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit, .btn-delete {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-edit {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 95%; /* Increased from 90% to 95% */
+    max-width: 800px; /* Increased from 500px to 800px */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        /* Form Styles */
+        .modal-content h2 {
+            margin-top: 0;
+            color: #f4711e;
+            font-size: 24px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="date"], select {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .btn-save {
+            background-color: #4285f4;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .btn-save:hover {
+            background-color: #3367d6;
+        }
+
+        form-group {
+    margin-bottom: 15px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: vertical;
+}
+
+.time-input {
+    display: flex;
+    gap: 5px;
+}
+
+.time-input select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.checkbox-group {
+    margin: 15px 0;
+}
+
+.recurring-options {
+    margin-top: 15px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>All Tasks</h1>
+        
+        <div class="controls">
+            <div>
+                <label>Start Date:</label>
+                <input type="date" class="date-input" id="startDate">
+            </div>
+            
+            <div>
+                <label>End Date:</label>
+                <input type="date" class="date-input" id="endDate">
+            </div>
+            
+            <select id="employeeSelect">
+                <option value="">Select an employee</option>
+            </select>
+            
+            <button class="btn btn-go">Go</button>
+            
+            <button class="btn btn-add" id="addTaskButton">
+                + Add New
+            </button>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Sr.No.</th>
+                    <th>Task Title</th>
+                    <th>Status</th>
+                    <th>Start Date</th>
+                    <th>Deadline</th>
+                    <th>Assign To</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="taskTableBody">
+                <!-- Task details will be dynamically populated here -->
+            </tbody>
+        </table>
+    </div>
+    
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2>Edit Task Details</h2>
+            <form id="editForm">
+                <input type="hidden" id="taskId">
+                
+                <div class="form-group">
+                    <label for="taskTitle">Title / कामाचे नाव *</label>
+                    <input type="text" id="taskTitle" required>
+                </div>
+    
+                <div class="form-group">
+                    <label for="taskDescription">Description / कार्य वर्णन *</label>
+                    <textarea id="taskDescription" placeholder="Enter Task Description" required></textarea>
+                </div>
+    
+                <div class="form-group">
+                    <label for="taskAssignTo">Assign To / नियुक्त करा *</label>
+                    <select id="taskAssignTo" required>
+                        <option value="" disabled selected>Select an employee</option>
+                    </select>
+                </div>
+    
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Start Date / सुरू दिनांक *</label>
+                        <input type="date" id="taskStartDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Start Time / सुरू वेळ *</label>
+                        <div class="time-input">
+                            <select id="startHours" required></select>
+                            <select id="startMinutes" required></select>
+                            <select id="startAmPm" required>
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Deadline / अंतिम दिनांक *</label>
+                        <input type="date" id="taskDeadlineDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Time / अंतिम वेळ *</label>
+                        <div class="time-input">
+                            <select id="endHours" required></select>
+                            <select id="endMinutes" required></select>
+                            <select id="endAmPm" required>
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Reminder Date / स्मरण दिनांक</label>
+                        <input type="date" id="taskReminderDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Set Reminder / आठवण काळ</label>
+                        <div class="time-input">
+                            <select id="reminderHours"></select>
+                            <select id="reminderMinutes"></select>
+                            <select id="reminderAmPm">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="checkbox-group">
+                    <input type="checkbox" id="taskRecurring">
+                    <label for="taskRecurring">Recurring</label>
+                </div>
+    
+                <div class="recurring-options" id="taskRecurringOptions" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskFrequency">Frequency / वारंवारता</label>
+                            <select id="taskFrequency">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="taskInterval">Interval / अंतर</label>
+                            <select id="taskInterval">
+                                <option value="">Select</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="taskCycle">Cycle / निलंबन</label>
+                            <select id="taskCycle">
+                                <option value="">Select</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+    
+                <button type="submit" class="btn-save">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+    <script>
+        // Function to fetch employees from the server
+        async function fetchEmployees() {
+            try {
+                const response = await fetch('/employees');
+                const employees = await response.json();
+                populateEmployeeSelect(employees);
+            } catch (error) {
+                console.error('Error fetching employees:', error);
+            }
+        }
+
+        // Function to populate the employee select dropdown
+        function populateEmployeeSelect(employees) {
+            const employeeSelect = document.getElementById('employeeSelect');
+            employees.forEach(employee => {
+                const option = document.createElement('option');
+                option.value = employee.id; // Assuming id is the unique identifier
+                option.textContent = employee.name; // Displaying employee name only
+                employeeSelect.appendChild(option);
+            });
+        }
+
+        // Function to fetch tasks from the server with optional filters
+        async function fetchTasks(startDate = '', endDate = '', employeeId = '') {
+            try {
+                const queryParams = new URLSearchParams({ startDate, endDate, employeeId });
+                const response = await fetch(`/tasks?${queryParams}`); // Pass parameters in query
+                const tasks = await response.json();
+                renderTasks(tasks);
+            } catch (error) {
+                console.error('Error fetching tasks:', error);
+            }
+        }
+
+        // Function to format date to 'DD-MM-YYYY'
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0'); // Get day and pad with zero if needed
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month (0-indexed)
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`; // Format to 'DD-MM-YYYY'
+        }
+
+        // Function to render tasks
+        function renderTasks(tasks) {
+            const tableBody = document.getElementById('taskTableBody');
+            tableBody.innerHTML = '';
+
+            if (tasks.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="7">No tasks available.</td></tr>'; // Display message if no tasks
+                return;
+            }
+
+            tasks.forEach(task => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${task.id}</td>
+                    <td>${task.title}</td>
+                    <td><span class="status-overdue">${task.status}</span></td>
+                    <td>${formatDate(task.start_date)}</td> <!-- Format start date -->
+                    <td>${formatDate(task.deadline_date)}</td>  <!-- Format deadline -->
+                    <td>${task.assign_to}</td> <!-- This will now show the employee's name -->
+                    <td class="actions">
+                        <button class="btn-edit" onclick="editTask(${task.id})">Edit</button>
+                        <button class="btn-delete" onclick="deleteTask(${task.id})">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+
+
+
+        // Function to delete a task without warning pop-up
+        async function deleteTask(taskId) {
+            console.log(`Deleting task with ID: ${taskId}`); // Log the task ID for debugging
+            try {
+                const response = await fetch(`/tasks/${taskId}`, { method: 'DELETE' });
+                if (response.ok) {
+                    console.log('Task deleted successfully');
+                    fetchTasks(); // Re-fetch the tasks after deletion
+                } else {
+                    console.error('Error deleting task');
+                }
+            } catch (error) {
+                console.error('Error deleting task:', error);
+            }
+        }
+
+        // Initialize the table by fetching tasks and employees
+        fetchTasks();
+        fetchEmployees();
+
+        // Redirect to add.html when "Add New" button is clicked
+        document.getElementById('addTaskButton').addEventListener('click', () => {
+            window.location.href = '/tasks/add-task'; // Adjust the path if necessary
+        });
+
+        // Filter tasks when "Go" button is clicked
+        document.querySelector('.btn-go').addEventListener('click', () => {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const employeeId = document.getElementById('employeeSelect').value;
+            console.log('Filtering by:', { startDate, endDate, employeeId });
+
+            // Fetch tasks with the specified filters
+            fetchTasks(startDate, endDate, employeeId);
+        });
+
+        // Function to edit task
+        async function editTask(taskId) {
+            try {
+                const response = await fetch(`/tasks/${taskId}`);
+                const task = await response.json();
+                
+                document.getElementById('taskId').value = task.id;
+                document.getElementById('taskTitle').value = task.title;
+                document.getElementById('taskStartDate').value = formatDateForInput(task.start_date);
+                document.getElementById('taskDeadlineDate').value = formatDateForInput(task.deadline_date);
+                document.getElementById('taskAssignTo').value = task.assign_to;
+
+                // Display the modal
+                document.getElementById('editModal').style.display = "block";
+            } catch (error) {
+                console.error('Error fetching task data for edit:', error);
+            }
+        }
+
+        // Function to format date for input fields (YYYY-MM-DD)
+        function formatDateForInput(dateString) {
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0];
+        }
+
+        // Close modal when clicking the X
+        document.getElementById('closeModal').onclick = function() {
+            document.getElementById('editModal').style.display = "none";
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('editModal')) {
+                document.getElementById('editModal').style.display = "none";
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('editForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const taskId = document.getElementById('taskId').value;
+            const updatedTask = {
+                title: document.getElementById('taskTitle').value,
+                start_date: document.getElementById('taskStartDate').value,
+                deadline_date: document.getElementById('taskDeadlineDate').value,
+                assign_to: document.getElementById('taskAssignTo').value
+            };
+
+            try {
+                const response = await fetch(`/tasks/${taskId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedTask)
+                });
+
+                if (response.ok) {
+                    document.getElementById('editModal').style.display = "none";
+                    fetchTasks(); // Refresh the task table
+                } else {
+                    console.error('Error updating task:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error updating task:', error);
+            }
+        });
+
+        // Modify the fetchEmployees function to populate both dropdowns
+        async function fetchEmployees() {
+            try {
+                const response = await fetch('/employees');
+                const employees = await response.json();
+                populateEmployeeSelect(employees);
+                populateTaskAssignSelect(employees); // Add this line
+            } catch (error) {
+                console.error('Error fetching employees:', error);
+            }
+        }
+
+        // New function to populate the task assignment dropdown
+        function populateTaskAssignSelect(employees) {
+            const taskAssignSelect = document.getElementById('taskAssignTo');
+            taskAssignSelect.innerHTML = '<option value="" disabled selected>Select an employee</option>';
+            employees.forEach(employee => {
+                const option = document.createElement('option');
+                option.value = employee.id;
+                option.textContent = employee.name;
+                taskAssignSelect.appendChild(option);
+            });
+        }
+
+        function initializeTimeDropdowns() {
+    const hoursDropdowns = ['startHours', 'endHours', 'reminderHours'];
+    const minutesDropdowns = ['startMinutes', 'endMinutes', 'reminderMinutes'];
+    
+    hoursDropdowns.forEach(id => {
+        const select = document.getElementById(id);
+        select.innerHTML = '';
+        for (let i = 1; i <= 12; i++) {
+            const option = document.createElement('option');
+            option.value = i.toString().padStart(2, '0');
+            option.textContent = i.toString().padStart(2, '0');
+            select.appendChild(option);
+        }
+    });
+
+    minutesDropdowns.forEach(id => {
+        const select = document.getElementById(id);
+        select.innerHTML = '';
+        for (let i = 0; i < 60; i++) {
+            const option = document.createElement('option');
+            option.value = i.toString().padStart(2, '0');
+            option.textContent = i.toString().padStart(2, '0');
+            select.appendChild(option);
+        }
+    });
+}
+
+// Toggle recurring options
+document.getElementById('taskRecurring').addEventListener('change', function() {
+    document.getElementById('taskRecurringOptions').style.display = 
+        this.checked ? 'block' : 'none';
+});
+
+// Modified editTask function
+async function editTask(taskId) {
+    try {
+        const response = await fetch(`/tasks/${taskId}`);
+        const task = await response.json();
+        
+        // Set basic fields
+        document.getElementById('taskId').value = task.id;
+        document.getElementById('taskTitle').value = task.title;
+        document.getElementById('taskDescription').value = task.description || '';
+        document.getElementById('taskAssignTo').value = task.assign_to;
+        
+        // Set dates
+        document.getElementById('taskStartDate').value = formatDateForInput(task.start_date);
+        document.getElementById('taskDeadlineDate').value = formatDateForInput(task.deadline_date);
+        if (task.reminder_date) {
+            document.getElementById('taskReminderDate').value = formatDateForInput(task.reminder_date);
+        }
+
+        // Set times
+        if (task.start_time) setTimeFields('start', task.start_time);
+        if (task.end_time) setTimeFields('end', task.end_time);
+        if (task.reminder_time) setTimeFields('reminder', task.reminder_time);
+
+        // Set recurring fields
+        document.getElementById('taskRecurring').checked = task.recurring || false;
+        document.getElementById('taskRecurringOptions').style.display = 
+            task.recurring ? 'block' : 'none';
+        
+        if (task.recurring) {
+            document.getElementById('taskFrequency').value = task.frequency || '1';
+            document.getElementById('taskInterval').value = task.task_interval || '';
+            document.getElementById('taskCycle').value = task.cycle || '';
+        }
+
+        // Display the modal
+        document.getElementById('editModal').style.display = "block";
+    } catch (error) {
+        console.error('Error fetching task data for edit:', error);
+    }
+}
+
+// Helper function to set time fields
+function setTimeFields(prefix, timeString) {
+    if (!timeString) return;
+    
+    const [time, period] = timeString.split(' ');
+    const [hours, minutes] = time.split(':');
+    
+    document.getElementById(`${prefix}Hours`).value = hours;
+    document.getElementById(`${prefix}Minutes`).value = minutes;
+    document.getElementById(`${prefix}AmPm`).value = period;
+}
+
+// Modified form submission
+document.getElementById('editForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    const taskId = document.getElementById('taskId').value;
+    const updatedTask = {
+        title: document.getElementById('taskTitle').value,
+        description: document.getElementById('taskDescription').value,
+        assign_to: document.getElementById('taskAssignTo').value,
+        start_date: document.getElementById('taskStartDate').value,
+        deadline_date: document.getElementById('taskDeadlineDate').value,
+        reminder_date: document.getElementById('taskReminderDate').value,
+        start_time: formatTime('start'),
+        end_time: formatTime('end'),
+        reminder_time: formatTime('reminder'),
+        recurring: document.getElementById('taskRecurring').checked,
+        frequency: document.getElementById('taskRecurring').checked ? 
+            document.getElementById('taskFrequency').value : null,
+        task_interval: document.getElementById('taskRecurring').checked ? 
+            document.getElementById('taskInterval').value : null,
+        cycle: document.getElementById('taskRecurring').checked ? 
+            document.getElementById('taskCycle').value : null
+    };
+
+    try {
+        const response = await fetch(`/tasks/${taskId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedTask)
+        });
+
+        if (response.ok) {
+            document.getElementById('editModal').style.display = "none";
+            fetchTasks(); // Refresh the task table
+        } else {
+            console.error('Error updating task:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error updating task:', error);
+    }
+});
+
+// Helper function to format time
+function formatTime(prefix) {
+    const hours = document.getElementById(`${prefix}Hours`).value;
+    const minutes = document.getElementById(`${prefix}Minutes`).value;
+    const ampm = document.getElementById(`${prefix}AmPm`).value;
+    return `${hours}:${minutes} ${ampm}`;
+}
+
+// Initialize time dropdowns when the page loads
+document.addEventListener('DOMContentLoaded', initializeTimeDropdowns);
+    </script>
+</body>
+</html>

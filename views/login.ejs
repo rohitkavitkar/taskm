@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f4f4; /* Light background for the login page */
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: #3E8DA8; /* Matching navbar color */
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            z-index: 99;
+        }
+
+        nav .navbar {
+            height: 100%;
+            max-width: 1250px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: auto;
+            padding: 0 50px;
+        }
+
+        .logo a {
+            font-size: 30px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-container h2 {
+            margin-bottom: 20px;
+            color: #3E8DA8; /* Title color matching the navbar */
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            background: #3E8DA8; /* Button color matching the navbar */
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .login-container button:hover {
+            background: #327a94; /* Darker shade for hover effect */
+        }
+
+        .signup {
+            margin-top: 15px;
+        }
+
+        .signup p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .signup a {
+            color: #3E8DA8;
+            text-decoration: none;
+        }
+
+        .signup a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Warning message styles */
+        .warning {
+            display: none; /* Hidden by default */
+            background-color: #f44336;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        @media (max-width: 920px) {
+            nav .navbar {
+                max-width: 100%;
+                padding: 0 25px;
+            }
+            nav .navbar .logo a {
+                font-size: 27px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="navbar">
+            <div class="logo"><a href="login.html">Task Management</a></div>
+        </div>
+    </nav>
+
+    <div class="login-container">
+        <h2>Login</h2>
+        <form action="/login" method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="signup">
+            <p>Don't have an account? <a href="register.html">Sign up</a>.</p>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 Task Management. All Rights Reserved.</p>
+        </div>
+
+        <!-- Warning message for incorrect credentials -->
+        <div id="warningMessage" class="warning">Invalid username or password!</div>
+    </div>
+
+    <script>
+        // Check for error in URL parameters
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('error')) {
+            document.getElementById('warningMessage').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

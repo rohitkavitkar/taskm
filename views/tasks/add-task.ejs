@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Create Task</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff; /* Retained existing background color */
+            line-height: 1.6; /* Adjusted for overall body */
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px 0;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-right i {
+            color: #666;
+            cursor: pointer;
+        }
+
+        .user-profile {
+            cursor: pointer;
+        }
+
+        .content {
+            background-color: white;
+            padding: 20px; /* Reduced padding */
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #FF6B2B;
+            margin-bottom: 30px;
+        }
+
+        .task-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* Reduced gap between form groups */
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px; /* Reduced gap between label and input */
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px; /* Reduced gap between form groups in a row */
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px; /* Adjust margin if necessary */
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .time-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .time-input select {
+            flex: 1;
+        }
+
+        .checkbox-group {
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .recurring-options {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .recurring-options.show {
+            display: block;
+        }
+
+        .file-input-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            background-color: #f0f0f0;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: normal;
+            margin-right: 10px;
+        }
+
+        .file-name {
+            color: #666;
+            font-size: 14px;
+        }
+
+        #submit-btn {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .form-row {
+                gap: 15px;
+            }
+
+            .form-group {
+                width: 100%;
+                font-size: large;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="main-content">
+        <div class="content">
+            <h1>Create Task</h1>
+            <form class="task-form" id="recurringTaskForm" action="/add" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="title">Title / कामाचे नाव *</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description / कार्य वर्णन *</label>
+                    <textarea id="description" name="description" placeholder="Enter Task Description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="assignTo">Assign To / नियुक्त करा *</label>
+                    <select id="assignTo" name="assignTo" required>
+                        <option value="">Select...</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Start Date / सुरू दिनांक *</label>
+                        <input type="date" name="start_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Start Time / सुरू वेळ *</label>
+                        <div class="time-input">
+                            <select id="start-hours" name="start_hours" required></select>
+                            <select id="start-minutes" name="start_minutes" required></select>
+                            <select id="start-am-pm" name="start_am_pm" required>
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Deadline / अंतिम दिनांक *</label>
+                        <input type="date" name="deadline_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Time / अंतिम वेळ *</label>
+                        <div class="time-input">
+                            <select id="end-hours" name="end_hours" required></select>
+                            <select id="end-minutes" name="end_minutes" required></select>
+                            <select id="end-am-pm" name="end_am_pm" required>
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Reminder Date / स्मरण दिनांक</label>
+                        <input type="date" name="reminder_date">
+                    </div>
+                    <div class="form-group">
+                        <label>Set Reminder / आठवण काळ</label>
+                        <div class="time-input">
+                            <select id="reminder-hours" name="reminder_hours"></select>
+                            <select id="reminder-minutes" name="reminder_minutes"></select>
+                            <select id="reminder-am-pm" name="reminder_am_pm">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="recurring" name="recurring">
+                    <label for="recurring">Recurring</label>
+                </div>
+
+                <div class="recurring-options" id="recurringOptions">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="frequency">Frequency / वारंवारता</label>
+                            <select id="frequency" name="frequency">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="task_interval">Interval / अंतर</label>
+                            <select id="task_interval" name="task_interval">
+                                <option value="">Select</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cycle">Cycle / निलंबन</label>
+                            <select id="cycle" name="cycle">
+                                <option value="">Select</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="file-input-wrapper">
+                    <label for="file" class="file-input-label">Choose file</label>
+                    <input type="file" id="file" name="file">
+                    <span class="file-name" id="file-name">No file chosen</span>
+                </div>
+
+                <button type="submit" id="submit-btn">Create Task</button>
+            </form>
+            <div class="result" id="resultMessage"></div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('recurring').addEventListener('change', function() {
+            const recurringOptions = document.getElementById('recurringOptions');
+            recurringOptions.classList.toggle('show', this.checked);
+        });
+
+        // Dynamically populate hour and minute selects
+        function populateTimeSelects() {
+            const hourOptions = [...Array(12).keys()].map(i => `<option value="${i + 1}">${i + 1}</option>`).join('');
+            const minuteOptions = [...Array(60).keys()].map(i => `<option value="${i}">${i}</option>`).join('');
+            document.querySelectorAll('select[id$="-hours"]').forEach(select => select.innerHTML = hourOptions);
+            document.querySelectorAll('select[id$="-minutes"]').forEach(select => select.innerHTML = minuteOptions);
+        }
+
+        // Fetch users and populate the Assign To dropdown
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/api/users');
+                const users = await response.json();
+                const assignToSelect = document.getElementById('assignTo');
+                
+                // Clear existing options
+                assignToSelect.innerHTML = '<option value="">Select...</option>';
+
+                // Populate the dropdown
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id; // Assuming you want to use user ID
+                    option.textContent = user.name; // Assuming the name field
+                    assignToSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                document.getElementById('resultMessage').textContent = 'Failed to load users. Please try again.';
+            }
+        }
+
+        // Update file name display
+        document.getElementById('file').addEventListener('change', function() {
+            const fileName = this.files.length > 0 ? this.files[0].name : 'No file chosen';
+            document.getElementById('file-name').textContent = fileName;
+        });
+
+        window.onload = function() {
+            populateTimeSelects();
+            fetchUsers(); // Fetch users when the page loads
+        };
+    </script>
+</body>
+</html>

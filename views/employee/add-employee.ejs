@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Employee</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 900px;
+        }
+        h1 {
+            color: #f7931e;
+            margin-bottom: 20px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px;
+            cursor: pointer;
+            color: #888;
+        }
+        .tab.active {
+            border-bottom: 2px solid #f7931e;
+            color: #f7931e;
+        }
+        .form-section {
+            display: none;
+        }
+        .form-section.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[readonly] {
+            background-color: #f0f0f0;
+        }
+        .password-input {
+            position: relative;
+        }
+        .password-input .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+        .button {
+            background-color: #3366ff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #254edb;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1 id="formTitle">Create Employee</h1>
+        <div class="tabs">
+            <div class="tab active" data-tab="general">General Info</div>
+            <div class="tab" data-tab="salary">Salary Info</div>
+        </div>
+        <form id="employeeForm" method="POST" action="/employee/add">
+            <!-- General Info Section -->
+            <div id="generalInfo" class="form-section active">
+                <div class="form-group">
+                    <label for="name">Name *</label>
+                    <input type="text" id="name" name="name" placeholder="Enter Employee Name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" placeholder="Enter Employee Email" required 
+                           pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$" 
+                           title="Please enter a valid email address (e.g., name@example.com)">
+                    <div class="error-message" id="emailError" style="display: none;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <div class="password-input">
+                        <input type="password" id="password" name="password" placeholder="Enter Password" required>
+                        <span class="toggle-password">👁️</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number (10 digits) *</label>
+                    <input type="tel" id="phone" name="phone" placeholder="Enter Phone Number" required 
+                           pattern="^\d{10}$" 
+                           title="Phone number must be exactly 10 digits.">
+                    <div class="error-message" id="phoneError" style="display: none;"></div>
+                </div>
+                <div class="error-message" id="errorMessage" style="display: none;"></div>
+                <button type="button" class="button" onclick="switchTab('salary')">Next</button>
+            </div>
+
+            <!-- Salary Info Section -->
+            <div id="salaryInfo" class="form-section">
+                <div class="form-group">
+                    <label for="salary">Salary *</label>
+                    <input type="number" id="salary" name="salary" >
+                </div>
+                <div class="form-group">
+                    <label for="dailyShift">Daily Shift (hrs) *</label>
+                    <input type="number" id="dailyShift" name="dailyShift" >
+                </div>
+                <div class="form-group">
+                    <label for="totalDays">Total Days (per month) *</label>
+                    <input type="number" id="totalDays" name="totalDays" >
+                </div>
+                <div class="form-group">
+                    <label for="hourlyRate">Hourly Rate</label>
+                    <input type="number" id="hourlyRate" name="hourlyRate" placeholder="Hourly Rate" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Employee Type:</label>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="ordinaryEmployee" name="ordinaryEmployee" value="Ordinary Employee"> Ordinary Employee
+                        </label>
+                        <label>
+                            <input type="checkbox" id="salesEmployee" name="salesEmployee" value="Sales Employee"> Sales Employee
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="button">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password visibility toggle
+            const togglePassword = document.querySelector('.toggle-password');
+            const passwordInput = document.querySelector('#password');
+            const tabs = document.querySelectorAll('.tab');
+            const formSections = document.querySelectorAll('.form-section');
+            const form = document.getElementById('employeeForm');
+            const salaryInput = document.getElementById('salary');
+            const dailyShiftInput = document.getElementById('dailyShift');
+            const totalDaysInput = document.getElementById('totalDays');
+            const hourlyRateInput = document.getElementById('hourlyRate');
+            const errorMessage = document.getElementById('errorMessage');
+            const phoneError = document.getElementById('phoneError');
+
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.textContent = type === 'password' ? '👁️' : '🔒';
+            });
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            });
+
+            [salaryInput, dailyShiftInput, totalDaysInput].forEach(input => {
+                input.addEventListener('input', calculateHourlyRate);
+            });
+
+            function calculateHourlyRate() {
+                const salary = parseFloat(salaryInput.value) || 0;
+                const dailyShift = parseFloat(dailyShiftInput.value) || 0;
+                const totalDays = parseFloat(totalDaysInput.value) || 0;
+
+                if (salary && dailyShift && totalDays) {
+                    const totalHours = dailyShift * totalDays;
+                    const hourlyRate = salary / totalHours;
+                    hourlyRateInput.value = hourlyRate.toFixed(2);
+                } else {
+                    hourlyRateInput.value = '';
+                }
+            }
+        });
+
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const formSections = document.querySelectorAll('.form-section');
+            const formTitle = document.getElementById('formTitle');
+            const errorMessage = document.getElementById('errorMessage');
+            const phoneError = document.getElementById('phoneError');
+            const emailError = document.getElementById('emailError');
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            // Check if all required fields in the General Info section are filled
+            if (tabName === 'salary') {
+                const name = document.getElementById('name').value.trim();
+                const password = document.getElementById('password').value.trim();
+
+                if (!name || !email || !password || !phone) {
+                    errorMessage.textContent = "Please fill in all required fields.";
+                    errorMessage.style.display = "block";
+                    return; // Prevent tab switch
+                } else if (!/^\d{10}$/.test(phone)) {
+                    phoneError.textContent = "Phone number must be exactly 10 digits.";
+                    phoneError.style.display = "block";
+                    return; // Prevent tab switch
+                } else {
+                    errorMessage.style.display = "none"; // Hide error message if all fields are filled
+                    phoneError.style.display = "none"; // Hide phone error if format is correct
+                }
+
+                if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+                    emailError.textContent = "Please enter a valid email address (e.g., name@example.com).";
+                    emailError.style.display = "block";
+                    return; // Prevent tab switch
+                } else {
+                    emailError.style.display = "none"; // Hide email error if format is correct
+                }
+            }
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            formSections.forEach(section => section.classList.remove('active'));
+
+            // Activate the clicked tab
+            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`${tabName}Info`).classList.add('active');
+
+            // Change the form title based on the active tab
+            formTitle.textContent = tabName === 'salary' ? 'Salary Info' : 'Create Employee';
+        }
+    </script>
+</body>
+</html>
